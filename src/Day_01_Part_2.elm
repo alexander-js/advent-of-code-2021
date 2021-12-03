@@ -1,53 +1,24 @@
 module Day_01_Part_2 exposing (..)
 
-type MeasurementWindow
-    = One Int
-    | Two Int Int
-    | Three Int Int Int
+solution : Int
+solution =
+    let
+        recurse increases remainder =
+            case remainder of
+                a :: b :: c :: d :: tail ->
+                    recurse
+                        ( if d > a then
+                            increases + 1
 
-
-addToWindow : Int -> MeasurementWindow -> MeasurementWindow
-addToWindow n window =
-    case window of
-        One n1 ->
-            Two n1 n
-
-        Two n1 n2 ->
-            Three n1 n2 n
-
-        full ->
-            full
-
-
-solution_foldl : Int
-solution_foldl =
-    List.foldl
-        (\curr acc ->
-            let
-                nextQueue =
-                    acc.queue
-                        |> List.map (addToWindow curr)
-                        |> (\queue -> queue ++ [ One curr ])
-            in
-            case nextQueue of
-                Three a1 a2 a3 :: Three b1 b2 b3 :: _ ->
-                    { queue = List.drop 1 nextQueue
-                    , increases =
-                        if List.sum [ a1, a2, a3 ] < List.sum [ b1, b2, b3 ] then
-                            acc.increases + 1
-
-                        else
-                            acc.increases
-                    }
+                          else
+                            increases
+                        )
+                        ( b :: c :: d :: tail )
 
                 _ ->
-                    { acc | queue = nextQueue }
-        )
-        { queue = []
-        , increases = 0
-        }
-        input
-            |> .increases
+                    increases
+    in
+    recurse 0 input
 
 
 input : List Int
